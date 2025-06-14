@@ -14,6 +14,7 @@ public class BlockPosUtils {
             boolean sturdy = state.isFaceSturdy(world, pos, Direction.UP);
             BlockState above = world.getBlockState(pos.above());
             if (sturdy && above.isAir()) {
+                pos.setY(y+1);
                 return pos;
             }
         }

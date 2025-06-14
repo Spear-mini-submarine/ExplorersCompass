@@ -54,7 +54,8 @@ public class ConfigHandler {
 		public final ForgeConfigSpec.BooleanValue translateStructureNames;
 		public final ForgeConfigSpec.EnumValue<OverlaySide> overlaySide;
 		public final ForgeConfigSpec.IntValue overlayLineOffset;
-
+		public final ForgeConfigSpec.BooleanValue ignoreOldExplored;
+		public final ForgeConfigSpec.BooleanValue ignoreOthersExplored;
 		Client(ForgeConfigSpec.Builder builder) {
 			String desc;
 			builder.push("Client");
@@ -71,6 +72,11 @@ public class ConfigHandler {
 			desc = "The side for information rendered on the HUD. Ex: LEFT, RIGHT";
 			overlaySide = builder.comment(desc).defineEnum("overlaySide", OverlaySide.LEFT);
 
+			desc = "Ignore structures you have explored when searching.";
+			ignoreOldExplored = builder.comment(desc).define("ignoreOldExplored", false);
+
+			desc = "Ignore structures explored by other players when searching.";
+			ignoreOthersExplored = builder.comment(desc).define("ignoreOthersExplored", false);
 			builder.pop();
 		}
 	}

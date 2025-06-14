@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.chaosthedude.explorerscompass.ExplorersCompass;
+import com.chaosthedude.explorerscompass.config.ConfigHandler;
 import com.chaosthedude.explorerscompass.items.ExplorersCompassItem;
 import com.chaosthedude.explorerscompass.network.ClearStructureCachePacket;
 import com.chaosthedude.explorerscompass.network.CompassSearchPacket;
@@ -185,12 +186,12 @@ public class ExplorersCompassScreen extends Screen {
 		searchTextField = new TransparentTextField(font, width / 2 - 82, 10, 140, 20, Component.translatable("string.explorerscompass.search"));
 		addRenderableWidget(searchTextField);
 
-
+		// 新增：忽略自己探索过的结构复选框
 		ignoreOldExploredBox = addRenderableWidget(new Checkbox(10, 115, 110, 20,
-				Component.nullToEmpty("忽略自己探索过的结构"), false));
+				Component.nullToEmpty("忽略自己探索过的结构"), ConfigHandler.CLIENT.ignoreOldExplored.get()));
 		// 新增：忽略其他玩家探索过的结构复选框
 		ignoreOthersExploredBox = addRenderableWidget(new Checkbox(10, 140, 110, 20,
-				Component.nullToEmpty("忽略其他玩家命中过的结构"), false));
+				Component.nullToEmpty("忽略其他玩家命中过的结构"), ConfigHandler.CLIENT.ignoreOthersExplored.get()));
 
 		// 新增：清除缓存按钮
 		clearCacheButton = addRenderableWidget(new TransparentButton(10, 165, 110, 20,
@@ -203,5 +204,13 @@ public class ExplorersCompassScreen extends Screen {
 		}
 		addRenderableWidget(selectionList);
 	}
+	//在关闭时保存历史选择
+	@Override
+	public void onClose() {
+		ConfigHandler.CLIENT.ignoreOldExplored.set(ignoreOldExploredBox.selected());
+		ConfigHandler.CLIENT.ignoreOthersExplored.set(ignoreOthersExploredBox.selected());
 
+		ConfigHandler.CLIENT_SPEC.save();
+		super.onClose();
+	}
 }
