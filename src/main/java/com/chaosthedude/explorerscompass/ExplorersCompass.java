@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.chaosthedude.explorerscompass.compat.ftbchunks.FtbchunksNavigationPointApi;
+import com.chaosthedude.explorerscompass.compat.ftbchunks.handler.impl.FtbchunksNavigationPointHandlerImpl;
+import com.chaosthedude.explorerscompass.compat.ftbchunks.network.FtbchunksNavigationPointPacket;
 import com.chaosthedude.explorerscompass.network.ClearStructureCachePacket;
+import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,9 +84,16 @@ public class ExplorersCompass {
 		network.registerMessage(0, CompassSearchPacket.class, CompassSearchPacket::toBytes, CompassSearchPacket::new, CompassSearchPacket::handle);
 		network.registerMessage(1, TeleportPacket.class, TeleportPacket::toBytes, TeleportPacket::new, TeleportPacket::handle);
 
+
+		//ftb chunks
+		if (ModList.get().isLoaded("ftbchunks")){
+			FtbchunksNavigationPointApi.registerNavigationPointHandler(new FtbchunksNavigationPointHandlerImpl());
+			network.registerMessage(10, FtbchunksNavigationPointPacket.class, FtbchunksNavigationPointPacket::toBytes, FtbchunksNavigationPointPacket::new, FtbchunksNavigationPointPacket::handle);
+		}
+
 		// Client packet
-		network.registerMessage(2, SyncPacket.class, SyncPacket::toBytes, SyncPacket::new, SyncPacket::handle);
-		network.registerMessage(3, ClearStructureCachePacket.class, ClearStructureCachePacket::toBytes, ClearStructureCachePacket::new, ClearStructureCachePacket::handle);
+		network.registerMessage(30, SyncPacket.class, SyncPacket::toBytes, SyncPacket::new, SyncPacket::handle);
+		network.registerMessage(31, ClearStructureCachePacket.class, ClearStructureCachePacket::toBytes, ClearStructureCachePacket::new, ClearStructureCachePacket::handle);
 		allowedStructureKeys = new ArrayList<ResourceLocation>();
 		dimensionKeysForAllowedStructureKeys = ArrayListMultimap.create();
 		structureKeysToTypeKeys = new HashMap<ResourceLocation, ResourceLocation>();

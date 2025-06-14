@@ -18,6 +18,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 缓存玩家搜索过的结构数据的类。
@@ -25,7 +26,7 @@ import java.util.*;
 public class PlayerStructureCache {
 
     public static final String FOLDER = "explorerscompass_player_cache";
-    private static final Map<UUID, String> uuidToName = new HashMap<>();
+    private static final Map<UUID, String> uuidToName = new ConcurrentHashMap<>();
     /**
      * 获取玩家名称，优先从缓存中获取，如果不存在则返回"Unknown"。
      */

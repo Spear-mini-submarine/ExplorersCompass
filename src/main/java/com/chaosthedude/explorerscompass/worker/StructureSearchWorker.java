@@ -3,6 +3,7 @@ package com.chaosthedude.explorerscompass.worker;
 import java.util.List;
 
 import com.chaosthedude.explorerscompass.ExplorersCompass;
+import com.chaosthedude.explorerscompass.compat.ftbchunks.FtbchunksNavigationPointApi;
 import com.chaosthedude.explorerscompass.config.ConfigHandler;
 import com.chaosthedude.explorerscompass.items.ExplorersCompassItem;
 import com.chaosthedude.explorerscompass.util.StructureUtils;
@@ -11,6 +12,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -21,6 +23,7 @@ import net.minecraft.world.level.levelgen.structure.StructureCheckResult;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.minecraftforge.common.WorldWorkerManager;
+import net.minecraftforge.fml.ModList;
 
 public abstract class StructureSearchWorker<T extends StructurePlacement> implements WorldWorkerManager.IWorker {
 	
@@ -110,6 +113,9 @@ public abstract class StructureSearchWorker<T extends StructurePlacement> implem
             ExplorersCompass.LOGGER.info("SearchWorkerManager {}: {} succeeded with {}{} samples", managerId, getName(), shouldLogRadius() ? getRadius() + " radius, " : "", samples);
 			if (!stack.isEmpty() && stack.getItem() == ExplorersCompass.explorersCompass) {
 				((ExplorersCompassItem) stack.getItem()).succeed(stack, StructureUtils.getKeyForStructure(level, structure), pos.getX(), pos.getZ(), samples, ConfigHandler.GENERAL.displayCoordinates.get());
+				if (ModList.get().isLoaded("ftbchunks")){
+					FtbchunksNavigationPointApi.addNavigationPoint((ServerPlayer) player,pos, StructureUtils.getKeyForStructure(level,structure).toString(), level.dimension());
+				}
 			} else {
                 ExplorersCompass.LOGGER.error("SearchWorkerManager {}: {} found invalid compass after successful search", managerId, getName());
 			}
