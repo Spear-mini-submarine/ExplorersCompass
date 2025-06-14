@@ -8,6 +8,9 @@ import java.util.Map;
 import com.chaosthedude.explorerscompass.compat.ftbchunks.FtbchunksNavigationPointApi;
 import com.chaosthedude.explorerscompass.compat.ftbchunks.handler.impl.FtbchunksNavigationPointHandlerImpl;
 import com.chaosthedude.explorerscompass.compat.ftbchunks.network.FtbchunksNavigationPointPacket;
+import com.chaosthedude.explorerscompass.compat.xaerominimap.XaerominimapNavigationPointApi;
+import com.chaosthedude.explorerscompass.compat.xaerominimap.handler.impl.XaerominimapNavigationPointHandlerImpl;
+import com.chaosthedude.explorerscompass.compat.xaerominimap.network.XaerominimapNavigationPointPacket;
 import com.chaosthedude.explorerscompass.network.ClearStructureCachePacket;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
@@ -85,10 +88,15 @@ public class ExplorersCompass {
 		network.registerMessage(1, TeleportPacket.class, TeleportPacket::toBytes, TeleportPacket::new, TeleportPacket::handle);
 
 
-		//ftb chunks
+		// Ftb Chunks
 		if (ModList.get().isLoaded("ftbchunks")){
 			FtbchunksNavigationPointApi.registerNavigationPointHandler(new FtbchunksNavigationPointHandlerImpl());
 			network.registerMessage(10, FtbchunksNavigationPointPacket.class, FtbchunksNavigationPointPacket::toBytes, FtbchunksNavigationPointPacket::new, FtbchunksNavigationPointPacket::handle);
+		}
+		// Xaero's Minimap
+		if (ModList.get().isLoaded("xaerominimap")) {
+			XaerominimapNavigationPointApi.registerNavigationPointHandler(new XaerominimapNavigationPointHandlerImpl());
+			network.registerMessage(11, XaerominimapNavigationPointPacket.class, XaerominimapNavigationPointPacket::toBytes, XaerominimapNavigationPointPacket::new, XaerominimapNavigationPointPacket::handle);
 		}
 
 		// Client packet

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.chaosthedude.explorerscompass.ExplorersCompass;
 import com.chaosthedude.explorerscompass.compat.ftbchunks.FtbchunksNavigationPointApi;
+import com.chaosthedude.explorerscompass.compat.xaerominimap.XaerominimapNavigationPointApi;
 import com.chaosthedude.explorerscompass.config.ConfigHandler;
 import com.chaosthedude.explorerscompass.items.ExplorersCompassItem;
 import com.chaosthedude.explorerscompass.util.StructureUtils;
@@ -113,8 +114,13 @@ public abstract class StructureSearchWorker<T extends StructurePlacement> implem
             ExplorersCompass.LOGGER.info("SearchWorkerManager {}: {} succeeded with {}{} samples", managerId, getName(), shouldLogRadius() ? getRadius() + " radius, " : "", samples);
 			if (!stack.isEmpty() && stack.getItem() == ExplorersCompass.explorersCompass) {
 				((ExplorersCompassItem) stack.getItem()).succeed(stack, StructureUtils.getKeyForStructure(level, structure), pos.getX(), pos.getZ(), samples, ConfigHandler.GENERAL.displayCoordinates.get());
+				//FTB Chunks 联动
 				if (ModList.get().isLoaded("ftbchunks")){
 					FtbchunksNavigationPointApi.addNavigationPoint((ServerPlayer) player,pos, StructureUtils.getKeyForStructure(level,structure).toString(), level.dimension());
+				}
+				// Xaero's Minimap 联动
+				if (ModList.get().isLoaded("xaerominimap")) {
+					XaerominimapNavigationPointApi.addNavigationPoint((ServerPlayer)player,pos,StructureUtils.getKeyForStructure(level,structure).toString(), level.dimension());
 				}
 			} else {
                 ExplorersCompass.LOGGER.error("SearchWorkerManager {}: {} found invalid compass after successful search", managerId, getName());
