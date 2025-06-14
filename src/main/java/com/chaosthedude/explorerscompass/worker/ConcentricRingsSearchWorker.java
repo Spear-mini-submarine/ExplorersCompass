@@ -22,8 +22,8 @@ public class ConcentricRingsSearchWorker extends StructureSearchWorker<Concentri
 	private double minDistance;
 	private Pair<BlockPos, Structure> closest;
 
-	public ConcentricRingsSearchWorker(ServerLevel level, Player player, ItemStack stack, BlockPos startPos, ConcentricRingsStructurePlacement placement, List<Structure> structureSet, String managerId) {
-		super(level, player, stack, startPos, placement, structureSet, managerId);
+	public ConcentricRingsSearchWorker(ServerLevel level, Player player, ItemStack stack, BlockPos startPos, ConcentricRingsStructurePlacement placement, List<Structure> structureSet, String managerId, StructureFoundCallback callback) {
+		super(level, player, stack, startPos, placement, structureSet, managerId,callback);
 
 		minDistance = Double.MAX_VALUE;
 		chunkIndex = 0;
@@ -31,7 +31,9 @@ public class ConcentricRingsSearchWorker extends StructureSearchWorker<Concentri
 
 		finished = !level.getServer().getWorldData().worldGenOptions().generateStructures() || potentialChunks == null || potentialChunks.isEmpty();
 	}
-
+	public ConcentricRingsSearchWorker(ServerLevel level, Player player, ItemStack stack, BlockPos startPos, ConcentricRingsStructurePlacement placement, List<Structure> structureSet, String managerId) {
+		this(level, player, stack, startPos, placement, structureSet, managerId, null);
+	}
 	@Override
 	public boolean hasWork() {
 		// Samples for this placement are not necessarily in order of closest to furthest, so disregard radius

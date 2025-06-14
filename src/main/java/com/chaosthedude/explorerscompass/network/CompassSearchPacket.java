@@ -21,16 +21,20 @@ public class CompassSearchPacket {
 	private int x;
 	private int y;
 	private int z;
-
+	private boolean ignoreOldExplored;
+	private boolean ignoreOthersExplored;
 	public CompassSearchPacket() {}
 
-	public CompassSearchPacket(ResourceLocation groupKey, List<ResourceLocation> structureKeys, BlockPos pos) {
+	public CompassSearchPacket(ResourceLocation groupKey, List<ResourceLocation> structureKeys, BlockPos pos,boolean ignoreOldExplored,boolean ignoreOthersExplored) {
 		this.groupKey = groupKey;
 		this.structureKeys = structureKeys;
 
 		this.x = pos.getX();
 		this.y = pos.getY();
 		this.z = pos.getZ();
+
+		this.ignoreOldExplored = ignoreOldExplored;
+		this.ignoreOthersExplored = ignoreOthersExplored;
 	}
 
 	public CompassSearchPacket(FriendlyByteBuf buf) {
@@ -45,6 +49,9 @@ public class CompassSearchPacket {
 		x = buf.readInt();
 		y = buf.readInt();
 		z = buf.readInt();
+
+		ignoreOldExplored = buf.readBoolean();
+		ignoreOthersExplored = buf.readBoolean();
 	}
 
 	public void toBytes(FriendlyByteBuf buf) {
@@ -58,6 +65,9 @@ public class CompassSearchPacket {
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
+
+		buf.writeBoolean(ignoreOldExplored);
+		buf.writeBoolean(ignoreOthersExplored);
 	}
 
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -65,7 +75,15 @@ public class CompassSearchPacket {
 			final ItemStack stack = ItemUtils.getHeldItem(ctx.get().getSender(), ExplorersCompass.explorersCompass);
 			if (!stack.isEmpty()) {
 				final ExplorersCompassItem explorersCompass = (ExplorersCompassItem) stack.getItem();
-				explorersCompass.searchForStructure(ctx.get().getSender().serverLevel(), ctx.get().getSender(), groupKey, structureKeys, new BlockPos(x, y, z), stack);
+				explorersCompass.searchForStructure(
+						ctx.get().getSender().serverLevel(),
+						ctx.get().getSender(),
+						groupKey,
+						structureKeys,
+						new BlockPos(x, y, z),
+						stack,
+						ignoreOldExplored,
+						ignoreOthersExplored);
 			}
 		});
 		ctx.get().setPacketHandled(true);

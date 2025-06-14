@@ -22,8 +22,8 @@ public class RandomSpreadSearchWorker extends StructureSearchWorker<RandomSpread
 	private int x;
 	private int z;
 
-	public RandomSpreadSearchWorker(ServerLevel level, Player player, ItemStack stack, BlockPos startPos, RandomSpreadStructurePlacement placement, List<Structure> structureSet, String managerId) {
-		super(level, player, stack, startPos, placement, structureSet, managerId);
+	public RandomSpreadSearchWorker(ServerLevel level, Player player, ItemStack stack, BlockPos startPos, RandomSpreadStructurePlacement placement, List<Structure> structureSet, String managerId, StructureFoundCallback callback) {
+		super(level, player, stack, startPos, placement, structureSet, managerId,callback);
 
 		spacing = placement.spacing();
 		startSectionPosX = SectionPos.blockToSectionCoord(startPos.getX());
@@ -34,7 +34,9 @@ public class RandomSpreadSearchWorker extends StructureSearchWorker<RandomSpread
 
 		finished = !level.getServer().getWorldData().worldGenOptions().generateStructures();
 	}
-
+	public RandomSpreadSearchWorker(ServerLevel level, Player player, ItemStack stack, BlockPos startPos, RandomSpreadStructurePlacement placement, List<Structure> structureSet, String managerId) {
+		this(level, player, stack, startPos, placement, structureSet, managerId, null);
+	}
 	@Override
 	public boolean hasWork() {
 		return super.hasWork();

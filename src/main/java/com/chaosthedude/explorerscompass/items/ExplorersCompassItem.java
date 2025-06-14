@@ -1,9 +1,10 @@
 package com.chaosthedude.explorerscompass.items;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import com.chaosthedude.explorerscompass.ExplorersCompass;
+import com.chaosthedude.explorerscompass.cache.PlayerStructureCache;
+import com.chaosthedude.explorerscompass.cache.StructureLocation;
 import com.chaosthedude.explorerscompass.config.ConfigHandler;
 import com.chaosthedude.explorerscompass.gui.GuiWrapper;
 import com.chaosthedude.explorerscompass.network.SyncPacket;
@@ -14,6 +15,7 @@ import com.chaosthedude.explorerscompass.util.StructureUtils;
 import com.chaosthedude.explorerscompass.worker.SearchWorkerManager;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -66,24 +68,72 @@ public class ExplorersCompassItem extends Item {
  		return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
  	}
 
-	public void searchForStructure(Level level, Player player, ResourceLocation categoryKey, List<ResourceLocation> structureKeys, BlockPos pos, ItemStack stack) {
+	public void searchForStructure(Level level, Player player, ResourceLocation categoryKey, List<ResourceLocation> structureKeys, BlockPos pos, ItemStack stack,boolean ignoreOldExplored, boolean ignoreOthersExplored) {
 		setSearching(stack, categoryKey, player);
 		setSearchRadius(stack, 0, player);
-		if (level instanceof ServerLevel) {
-			ServerLevel serverLevel = (ServerLevel) level;
-			List<Structure> structures = new ArrayList<Structure>();
+		if (level instanceof ServerLevel serverLevel && player instanceof ServerPlayer serverPlayer) {
+			// ========== 新增：玩家缓存逻辑 ==========
+			Set<StructureLocation> myCache = PlayerStructureCache.getCache(serverLevel,serverPlayer.getUUID());
+
+			List<Structure> structures = new ArrayList<>();
 			for (ResourceLocation key : structureKeys) {
 				structures.add(StructureUtils.getStructureForKey(serverLevel, key));
 			}
 			workerManager.stop();
-			workerManager.createWorkers(serverLevel, player, stack, structures, pos);
+			workerManager.createWorkers(serverLevel, player, stack, structures, pos,
+					(foundPos, foundStructure) -> {
+						StructureLocation foundLoc = new StructureLocation(
+								StructureUtils.getKeyForStructure(serverLevel, foundStructure),
+								serverLevel.dimension().location().toString(),
+								foundPos.getX(), foundPos.getZ()
+						);
+						// 如果已缓存，跳过
+						if (ignoreOldExplored&&myCache.contains(foundLoc)) {
+							// 跳过
+							return false;
+						}
+						// 加入自己的缓存
+						PlayerStructureCache.addToCache(serverPlayer, foundLoc);
+						// 检查其他玩家缓存
+						for (UUID other : PlayerStructureCache.getUuidToName().keySet()) {
+							if (!other.equals(serverPlayer.getUUID())) {
+								if (PlayerStructureCache.getCache(serverLevel,other).contains(foundLoc)) {
+									if (ignoreOthersExplored){
+										//跳过其他玩家已探索的结构
+										return false;
+									}else {
+										// 提示：该结构已被other探索
+										showExploredByOtherPlayer(serverPlayer, PlayerStructureCache.getName(other), foundLoc);
+										setOtherPlayerName(stack, PlayerStructureCache.getName(other));
+									}
+								}
+							}
+						}
+						return true;
+					}
+			);
 			boolean started = workerManager.start();
 			if (!started) {
 				setNotFound(stack, 0, 0);
 			}
 		}
 	}
-	
+
+	private void showExploredByOtherPlayer(ServerPlayer player, String otherPlayerName, StructureLocation loc) {
+		String i18nKey = "structure." + loc.structureKey.getNamespace() + "." + loc.structureKey.getPath();
+		Component localizedName = Component.translatable(i18nKey);
+		player.sendSystemMessage(Component.literal("本次搜索命中的结构")
+				.append(localizedName)
+				.append(String.format(" X=%d - Z=%d，已被玩家%s搜索", loc.x, loc.z, otherPlayerName))
+		);
+	}
+	public void setOtherPlayerName(ItemStack stack, String otherPlayerName) {
+		if (ItemUtils.verifyNBT(stack)) {
+            if (stack.getTag() != null) {
+                stack.getTag().putString("otherPlayer", otherPlayerName);
+            }
+        }
+	}
 	public void succeed(ItemStack stack, ResourceLocation structureKey, int x, int z, int samples, boolean displayCoordinates) {
 		setFound(stack, structureKey, x, z, samples);
 		setDisplayCoordinates(stack, displayCoordinates);

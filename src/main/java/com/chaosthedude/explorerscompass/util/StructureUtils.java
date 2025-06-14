@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.text.WordUtils;
 
 import com.chaosthedude.explorerscompass.ExplorersCompass;
@@ -135,6 +136,17 @@ public class StructureUtils {
 	public static int getHorizontalDistanceToLocation(BlockPos startPos, int x, int z) {
 		return (int) Mth.sqrt((float) startPos.distSqr(new BlockPos(x, startPos.getY(), z)));
 	}
+	public static String getExploredByOtherPlayerName(ItemStack stack, Player player) {
+		if (ItemUtils.verifyNBT(stack)) {
+            if (stack.getTag() != null) {
+				String otherPlayer = stack.getTag().getString("otherPlayer");
+				if (!otherPlayer.isEmpty()&&!player.getName().getString().equals(otherPlayer)) {
+					return otherPlayer;
+				}
+            }
+		}
+		return null;
+	}
 
 	@OnlyIn(Dist.CLIENT)
 	public static String getPrettyStructureName(ResourceLocation key) {
@@ -214,5 +226,4 @@ public class StructureUtils {
 		regex += "$";
 		return regex;
 	}
-
 }

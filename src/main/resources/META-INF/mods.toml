@@ -4,10 +4,10 @@ license="CC BY-NC-SA 4.0"
 issueTrackerURL="https://github.com/MattCzyr/ExplorersCompass/issues"
 [[mods]]
     modId="explorerscompass"
-    version="1.20.1-1.3.3-forge"
+    version="1.20.1-1.3.3-forge-Unofficial"
     displayName="Explorer's Compass"
     displayURL="https://github.com/MattCzyr/ExplorersCompass"
-    authors="ChaosTheDude"
+    authors="ChaosTheDude,heike233"
     description='''
     Search for and locate structures anywhere in the world.
     '''

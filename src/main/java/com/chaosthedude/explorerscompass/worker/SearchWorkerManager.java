@@ -28,30 +28,34 @@ public class SearchWorkerManager {
 	public SearchWorkerManager() {
 		workers = new ArrayList<StructureSearchWorker<?>>();
 	}
-	
-	public void createWorkers(ServerLevel level, Player player, ItemStack stack, List<Structure> structures, BlockPos startPos) {
+
+	// 新方法，支持回调
+	public void createWorkers(ServerLevel level, Player player, ItemStack stack, List<Structure> structures, BlockPos startPos, StructureFoundCallback callback) {
 		workers.clear();
-		
+
 		Map<StructurePlacement, List<Structure>> placementToStructuresMap = new Object2ObjectArrayMap<>();
-		
+
 		for (Structure structure : structures) {
-			for (StructurePlacement structureplacement : level.getChunkSource().getGeneratorState().getPlacementsForStructure(StructureUtils.getHolderForStructure(level, structure))) {
-				placementToStructuresMap.computeIfAbsent(structureplacement, (holderSet) -> {
-					return new ObjectArrayList<Structure>();
-				}).add(structure);
+			for (StructurePlacement placement : level.getChunkSource().getGeneratorState().getPlacementsForStructure(StructureUtils.getHolderForStructure(level, structure))) {
+				placementToStructuresMap.computeIfAbsent(placement, k -> new ObjectArrayList<>()).add(structure);
 			}
 		}
 
 		for (Map.Entry<StructurePlacement, List<Structure>> entry : placementToStructuresMap.entrySet()) {
 			StructurePlacement placement = entry.getKey();
 			if (placement instanceof ConcentricRingsStructurePlacement) {
-				workers.add(new ConcentricRingsSearchWorker(level, player, stack, startPos, (ConcentricRingsStructurePlacement) placement, entry.getValue(), id));
+				workers.add(new ConcentricRingsSearchWorker(level, player, stack, startPos, (ConcentricRingsStructurePlacement) placement, entry.getValue(), id, callback));
 			} else if (placement instanceof RandomSpreadStructurePlacement) {
-				workers.add(new RandomSpreadSearchWorker(level, player, stack, startPos, (RandomSpreadStructurePlacement) placement, entry.getValue(), id));
+				workers.add(new RandomSpreadSearchWorker(level, player, stack, startPos, (RandomSpreadStructurePlacement) placement, entry.getValue(), id, callback));
 			} else {
-				workers.add(new GenericSearchWorker(level, player, stack, startPos, placement, entry.getValue(), id));
+				workers.add(new GenericSearchWorker(level, player, stack, startPos, placement, entry.getValue(), id, callback));
 			}
 		}
+	}
+
+	// 兼容旧接口
+	public void createWorkers(ServerLevel level, Player player, ItemStack stack, List<Structure> structures, BlockPos startPos) {
+		createWorkers(level, player, stack, structures, startPos, null);
 	}
 	
 	// Returns true if a worker starts, false otherwise

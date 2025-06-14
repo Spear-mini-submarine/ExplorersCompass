@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.chaosthedude.explorerscompass.ExplorersCompass;
 import com.chaosthedude.explorerscompass.items.ExplorersCompassItem;
+import com.chaosthedude.explorerscompass.network.ClearStructureCachePacket;
 import com.chaosthedude.explorerscompass.network.CompassSearchPacket;
 import com.chaosthedude.explorerscompass.network.TeleportPacket;
 import com.chaosthedude.explorerscompass.sorting.ISorting;
@@ -15,6 +16,7 @@ import com.chaosthedude.explorerscompass.util.StructureUtils;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -41,7 +43,9 @@ public class ExplorersCompassScreen extends Screen {
 	private TransparentTextField searchTextField;
 	private StructureSearchList selectionList;
 	private ISorting sortingCategory;
-
+	private Checkbox ignoreOthersExploredBox;
+	private Checkbox ignoreOldExploredBox;
+	private TransparentButton clearCacheButton;
 	public ExplorersCompassScreen(Level level, Player player, ItemStack stack, ExplorersCompassItem explorersCompass, List<ResourceLocation> allowedStructureKeys) {
 		super(Component.translatable("string.explorerscompass.selectStructure"));
 		this.level = level;
@@ -113,12 +117,12 @@ public class ExplorersCompassScreen extends Screen {
 	}
 
 	public void searchForStructure(ResourceLocation key) {
-		ExplorersCompass.network.sendToServer(new CompassSearchPacket(key, List.of(key), player.blockPosition()));
+		ExplorersCompass.network.sendToServer(new CompassSearchPacket(key, List.of(key), player.blockPosition(), ignoreOldExploredBox.selected(), ignoreOthersExploredBox.selected()));
 		minecraft.setScreen(null);
 	}
 	
 	public void searchForGroup(ResourceLocation key) {
-		ExplorersCompass.network.sendToServer(new CompassSearchPacket(key, ExplorersCompass.typeKeysToStructureKeys.get(key), player.blockPosition()));
+		ExplorersCompass.network.sendToServer(new CompassSearchPacket(key, ExplorersCompass.typeKeysToStructureKeys.get(key), player.blockPosition(), ignoreOldExploredBox.selected(), ignoreOthersExploredBox.selected()));
 		minecraft.setScreen(null);
 	}
 
@@ -180,7 +184,20 @@ public class ExplorersCompassScreen extends Screen {
 		
 		searchTextField = new TransparentTextField(font, width / 2 - 82, 10, 140, 20, Component.translatable("string.explorerscompass.search"));
 		addRenderableWidget(searchTextField);
-		
+
+
+		ignoreOldExploredBox = addRenderableWidget(new Checkbox(10, 115, 110, 20,
+				Component.nullToEmpty("忽略自己探索过的结构"), false));
+		// 新增：忽略其他玩家探索过的结构复选框
+		ignoreOthersExploredBox = addRenderableWidget(new Checkbox(10, 140, 110, 20,
+				Component.nullToEmpty("忽略其他玩家命中过的结构"), false));
+
+		// 新增：清除缓存按钮
+		clearCacheButton = addRenderableWidget(new TransparentButton(10, 165, 110, 20,
+				Component.nullToEmpty("清除缓存"), (onPress) -> {
+			ExplorersCompass.network.sendToServer(new ClearStructureCachePacket());
+		}
+		));
 		if (selectionList == null) {
 			selectionList = new StructureSearchList(this, minecraft, width + 110, height, 40, height, 45);
 		}
