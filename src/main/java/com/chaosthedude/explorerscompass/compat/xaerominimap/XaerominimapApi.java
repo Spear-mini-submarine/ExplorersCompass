@@ -1,15 +1,15 @@
 package com.chaosthedude.explorerscompass.compat.xaerominimap;
 
-import com.chaosthedude.explorerscompass.compat.xaerominimap.handler.IXaerominimapNavigationPointHandler;
+import com.chaosthedude.explorerscompass.compat.xaerominimap.handler.IXaerominimapHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
-public class XaerominimapNavigationPointApi {
-    private static IXaerominimapNavigationPointHandler handler = null;
+public class XaerominimapApi {
+    private static IXaerominimapHandler handler = null;
 
-    public static void registerNavigationPointHandler(IXaerominimapNavigationPointHandler h) {
+    public static void registerNavigationPointHandler(IXaerominimapHandler h) {
         handler = h;
     }
 

@@ -5,6 +5,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
-public interface IFtbchunksNavigationPointHandler {
+public interface IFtbchunksHandler {
     void addNavigationPoint(ServerPlayer serverPlayer, BlockPos pos, String name, ResourceKey<Level> dimension);
 }

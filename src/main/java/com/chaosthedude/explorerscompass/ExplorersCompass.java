@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.chaosthedude.explorerscompass.compat.ftbchunks.FtbchunksNavigationPointApi;
-import com.chaosthedude.explorerscompass.compat.ftbchunks.handler.impl.FtbchunksNavigationPointHandlerImpl;
-import com.chaosthedude.explorerscompass.compat.ftbchunks.network.FtbchunksNavigationPointPacket;
-import com.chaosthedude.explorerscompass.compat.xaerominimap.XaerominimapNavigationPointApi;
-import com.chaosthedude.explorerscompass.compat.xaerominimap.handler.impl.XaerominimapNavigationPointHandlerImpl;
-import com.chaosthedude.explorerscompass.compat.xaerominimap.network.XaerominimapNavigationPointPacket;
+import com.chaosthedude.explorerscompass.compat.ftbchunks.FtbchunksApi;
+import com.chaosthedude.explorerscompass.compat.ftbchunks.handler.impl.FtbchunksHandlerImpl;
+import com.chaosthedude.explorerscompass.compat.ftbchunks.network.FtbchunksPacket;
+import com.chaosthedude.explorerscompass.compat.journeymap.JourneymapApi;
+import com.chaosthedude.explorerscompass.compat.journeymap.handler.impl.JourneymapHandlerImpl;
+import com.chaosthedude.explorerscompass.compat.journeymap.network.JourneymapPacket;
+import com.chaosthedude.explorerscompass.compat.xaerominimap.XaerominimapApi;
+import com.chaosthedude.explorerscompass.compat.xaerominimap.handler.impl.XaerominimapHandlerImpl;
+import com.chaosthedude.explorerscompass.compat.xaerominimap.network.XaerominimapPacket;
 import com.chaosthedude.explorerscompass.network.ClearStructureCachePacket;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
@@ -90,15 +93,18 @@ public class ExplorersCompass {
 
 		// Ftb Chunks
 		if (ModList.get().isLoaded("ftbchunks")){
-			FtbchunksNavigationPointApi.registerNavigationPointHandler(new FtbchunksNavigationPointHandlerImpl());
-			network.registerMessage(10, FtbchunksNavigationPointPacket.class, FtbchunksNavigationPointPacket::toBytes, FtbchunksNavigationPointPacket::new, FtbchunksNavigationPointPacket::handle);
+			FtbchunksApi.registerNavigationPointHandler(new FtbchunksHandlerImpl());
+			network.registerMessage(10, FtbchunksPacket.class, FtbchunksPacket::toBytes, FtbchunksPacket::new, FtbchunksPacket::handle);
 		}
 		// Xaero's Minimap
 		if (ModList.get().isLoaded("xaerominimap")) {
-			XaerominimapNavigationPointApi.registerNavigationPointHandler(new XaerominimapNavigationPointHandlerImpl());
-			network.registerMessage(11, XaerominimapNavigationPointPacket.class, XaerominimapNavigationPointPacket::toBytes, XaerominimapNavigationPointPacket::new, XaerominimapNavigationPointPacket::handle);
+			XaerominimapApi.registerNavigationPointHandler(new XaerominimapHandlerImpl());
+			network.registerMessage(11, XaerominimapPacket.class, XaerominimapPacket::toBytes, XaerominimapPacket::new, XaerominimapPacket::handle);
 		}
-
+		if (ModList.get().isLoaded("journeymap")){
+			JourneymapApi.registerNavigationPointHandler(new JourneymapHandlerImpl());
+			network.registerMessage(12, JourneymapPacket.class, JourneymapPacket::toBytes, JourneymapPacket::new, JourneymapPacket::handle);
+		}
 		// Client packet
 		network.registerMessage(30, SyncPacket.class, SyncPacket::toBytes, SyncPacket::new, SyncPacket::handle);
 		network.registerMessage(31, ClearStructureCachePacket.class, ClearStructureCachePacket::toBytes, ClearStructureCachePacket::new, ClearStructureCachePacket::handle);

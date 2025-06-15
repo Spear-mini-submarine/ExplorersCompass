@@ -1,8 +1,10 @@
 package com.chaosthedude.explorerscompass.compat.xaerominimap.network;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
@@ -20,18 +22,18 @@ import java.util.function.Supplier;
 /**
  * Xaero's Minimap的联动网络包，用于处理导航点的添加。
  */
-public class XaerominimapNavigationPointPacket {
+public class XaerominimapPacket {
     private final BlockPos blockPos;
     private final String name;
     private final ResourceKey<Level> dimension;
 
-    public XaerominimapNavigationPointPacket(BlockPos blockPos, String name, ResourceKey<Level> dimension) {
+    public XaerominimapPacket(BlockPos blockPos, String name, ResourceKey<Level> dimension) {
         this.blockPos = blockPos;
         this.name = name;
         this.dimension = dimension;
     }
 
-    public XaerominimapNavigationPointPacket(FriendlyByteBuf buf) {
+    public XaerominimapPacket(FriendlyByteBuf buf) {
         this.blockPos = buf.readBlockPos();
         this.name = buf.readUtf(32767);
         this.dimension = buf.readResourceKey(Registries.DIMENSION);
@@ -57,6 +59,9 @@ public class XaerominimapNavigationPointPacket {
             Waypoint waypoint = new Waypoint(blockPos.getX(), blockPos.getY(), blockPos.getZ(), name, "QVQ", WaypointColor.RED,WaypointPurpose.DESTINATION);
 
             waypointSet.add(waypoint);
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.sendSystemMessage(Component.nullToEmpty("已将路径点添加到Xaero"));
+            }
         });
         ctx.get().setPacketHandled(true);
     }

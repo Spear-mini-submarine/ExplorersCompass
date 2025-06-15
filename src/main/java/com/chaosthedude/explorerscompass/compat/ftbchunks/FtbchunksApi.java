@@ -1,15 +1,15 @@
 package com.chaosthedude.explorerscompass.compat.ftbchunks;
 
-import com.chaosthedude.explorerscompass.compat.ftbchunks.handler.IFtbchunksNavigationPointHandler;
+import com.chaosthedude.explorerscompass.compat.ftbchunks.handler.IFtbchunksHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
-public class FtbchunksNavigationPointApi {
-    private static IFtbchunksNavigationPointHandler handler = null;
+public class FtbchunksApi {
+    private static IFtbchunksHandler handler = null;
 
-    public static void registerNavigationPointHandler(IFtbchunksNavigationPointHandler h) {
+    public static void registerNavigationPointHandler(IFtbchunksHandler h) {
         handler = h;
     }
 

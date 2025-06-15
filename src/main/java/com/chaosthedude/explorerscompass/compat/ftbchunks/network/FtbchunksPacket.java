@@ -2,9 +2,11 @@ package com.chaosthedude.explorerscompass.compat.ftbchunks.network;
 
 import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
 import dev.ftb.mods.ftbchunks.api.client.waypoint.Waypoint;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -15,18 +17,18 @@ import net.minecraft.world.level.Level;
 
 import java.util.Optional;
 
-public class FtbchunksNavigationPointPacket {
+public class FtbchunksPacket {
     private final BlockPos blockPos;
     private final String name;
     private final ResourceKey<Level> dimension;
 
-    public FtbchunksNavigationPointPacket(BlockPos blockPos, String name, ResourceKey<Level> dimension) {
+    public FtbchunksPacket(BlockPos blockPos, String name, ResourceKey<Level> dimension) {
         this.blockPos = blockPos;
         this.name = name;
         this.dimension = dimension;
     }
 
-    public FtbchunksNavigationPointPacket(FriendlyByteBuf buf) {
+    public FtbchunksPacket(FriendlyByteBuf buf) {
         this.blockPos = buf.readBlockPos();
         this.name = buf.readUtf(32767);
         this.dimension = buf.readResourceKey(Registries.DIMENSION);
@@ -46,6 +48,9 @@ public class FtbchunksNavigationPointPacket {
                 WaypointManager waypointManager = optManager.get();
                 Waypoint waypoint = waypointManager.addWaypointAt(blockPos, this.name);
                 waypoint.setHidden(false);
+            }
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.sendSystemMessage(Component.nullToEmpty("已将路径点添加到FTBChunks"));
             }
         });
         ctx.get().setPacketHandled(true);
