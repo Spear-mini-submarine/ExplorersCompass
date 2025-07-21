@@ -56,7 +56,7 @@ public class XaerominimapPacket {
             WaypointSet waypointSet = currentWorld.getWaypointSet(setId);
 
             //构造目标点
-            Waypoint waypoint = new Waypoint(blockPos.getX(), blockPos.getY(), blockPos.getZ(), name, "QVQ", WaypointColor.RED,WaypointPurpose.DESTINATION);
+            Waypoint waypoint = new Waypoint(blockPos.getX(), blockPos.getY(), blockPos.getZ(),  "由探险者指南针添加",name, WaypointColor.RED,WaypointPurpose.DESTINATION);
 
             waypointSet.add(waypoint);
             if (Minecraft.getInstance().player != null) {
