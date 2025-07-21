@@ -47,6 +47,7 @@ public class PlayerStructureCache {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(cacheDir, "*.nbt")) {
             for (Path entry : stream) {
                 String fileName = entry.getFileName().toString();
+                if (fileName.endsWith("shared_structures_cache.nbt")) continue;
                 String uuidString = fileName.substring(0, fileName.length() - 4);
                 UUID uuid = UUID.fromString(uuidString);
 

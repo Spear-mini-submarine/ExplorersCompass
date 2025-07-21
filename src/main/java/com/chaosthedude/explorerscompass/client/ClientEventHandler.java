@@ -52,7 +52,7 @@ public class ClientEventHandler {
 
 						RenderUtils.drawConfiguredStringOnHUD(event.getGuiGraphics(), I18n.get("string.explorerscompass.distance"), 5, 5, 0xFFFFFF, 9);
 						RenderUtils.drawConfiguredStringOnHUD(event.getGuiGraphics(), String.valueOf(StructureUtils.getHorizontalDistanceToLocation(player, compass.getFoundStructureX(stack), compass.getFoundStructureZ(stack))), 5, 5, 0xAAAAAA, 10);
-						String exploredBy = StructureUtils.getExploredByOtherPlayerName(stack, player); // 你需要实现此方法
+						String exploredBy = StructureUtils.getExploredByOtherPlayerName(stack, player);
 						if (exploredBy != null) {
 							RenderUtils.drawConfiguredStringOnHUD(event.getGuiGraphics(), "该结构已被" + exploredBy + "探索过了", 5, 5, 0xFFAA00, 12);
 						}else {

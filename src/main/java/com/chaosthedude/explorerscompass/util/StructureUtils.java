@@ -140,7 +140,10 @@ public class StructureUtils {
 		if (ItemUtils.verifyNBT(stack)) {
             if (stack.getTag() != null) {
 				String otherPlayer = stack.getTag().getString("otherPlayer");
-				if (!otherPlayer.isEmpty()&&!player.getName().getString().equals(otherPlayer)) {
+				if (!otherPlayer.isEmpty()) {
+					if (player.getName().getString().equals(otherPlayer)){
+						return "你自己";
+					}
 					return otherPlayer;
 				}
             }
